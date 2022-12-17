@@ -68,9 +68,16 @@ class background():                 # class creates backround which moves downwa
 
         if self.scroll >= self.height: # when bg image moves too far down, its reseted to the top (0), this creates a loop of an infinitely moving backround
             self.scroll = 0
+    def pause_bg(self):
+        self.speed = 0
+    def unpause_bg(self):
+        self.speed = 2
+
+
 
 menu_bg= background('space_jam_files/black_bg.jpg',0.5) # this class^ which generates a moving background, is very convenient, as the game is developed, levels will be made, which each are located on a specific planet or part of space, requiring a unique backround
 game_active_bg = background('space_jam_files/black_bg.jpg',2) # simply choose image and speed and you have your background, automatically fitted to the screen, speed = 0 for still image
+pause_bg = background('space_jam_files/black_bg.jpg',0)
 
 class entity(): # having an entity class which player and orc class will inherit from clears up code, and is better structured                              
     def __init__(self,x,y,width,height,health):
@@ -138,7 +145,6 @@ class Orc(enemy):
     def attack(self): # enemy attack mechanic under progress
         pass
         
-paused = False # placeholder
 pause_text = main_text("Paused",350,200)
 class player(entity):
     def __init__(self,x,y,width,height,health):
@@ -148,7 +154,7 @@ class player(entity):
         self.right = False
         self.left = False
         self.firing = False
-        keys = pygame.key.get_pressed()
+        keys = pygame.key.get_pressed() # get_ pressed returns current state of the key
         if keys[pygame.K_LEFT]:
             self.left = True
             self.right = False
@@ -169,15 +175,7 @@ class player(entity):
         if settings_active == True: # keeps the spaceship on the left side of the screen in the settings menu
             if self.x >= 310:
                 self.x = 310
-        if keys[pygame.K_p]: # pause button under progress
-            global paused
-            paused = True # pause method under progress
-            if paused == True:
-                pause_text.display() # currently works for selected sleep time but text does not display
-            if paused == True:
-                time.sleep(5)
-                paused = False 
-                    
+
     def attack(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE]:
@@ -187,6 +185,27 @@ class player(entity):
         if self.firing ==True:
             laser_rect = pygame.Rect(self.x + 33,-20,4,424) # creates rect for laser which checks collision with orc
             pygame.draw.rect(win,(255,0,0),(laser_rect)) # blits laser on screen
+def pause():
+    paused = True
+
+    while paused:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_p:
+                    paused = False
+
+
+                elif key[pygame.K_q]:
+                    pygame.quit()
+                    quit()
+        game_active_bg.pause_bg()
+        pause_text.display()
+        pygame.display.update()
+        clock.tick(10)
 
 # ga is game active, sp is spaceship
 ga_sp_1 = player(400,380,70,100,900)
@@ -207,10 +226,10 @@ settings_back_tab = menu_tab("Go Back",400,210,)
 speed_text = main_text("Speed is",100,80) # This text will always display
 
 speed_50_text = main_text("50",150,120) # settings menu is under progress if add or lower speed, a different speed text will display
-speed_100_text = main_text("100",150,120) # if add or lower speed, a different speed text will display, and sp speed will change
+speed_100_text = main_text("100",150,120) # if add or lower speed, a different speed text will display
 speed_150_text = main_text("150",150,120)
 
-settings_sp_1 = player(140,200,100,130,900) # this sp will only use draw and movement method, for player to test speed
+settings_sp_1 = player(140,200,100,130,900) # this sp will only use draw method, to stay static as an image on the screen
 settings_sp_2 = player(140,200,100,130,900)
 
 menu_active = True
@@ -224,6 +243,9 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_p:
+                pause()
 
     if menu_active == True:
         # menu options on the right side
@@ -245,24 +267,29 @@ while True:
             if settings_tab.rect.collidepoint(pygame.mouse.get_pos()): # opens settings menu
                 settings_active = True
 
+
     if game_active == True:
         menu_active = False
-        game_active_bg.display()
+        game_active_bg.unpause_bg()
         if sp_1 == True:
-            ga_sp_1.draw('space_jam_files\/sp_2.xcf')
+            sp_2 = False
+            game_active_bg.display()
+            ga_sp_1.draw('space_jam_files\/spaceship.png')
             ga_sp_1.movement()
             ga_sp_1.attack()
             ga_sp_1.draw_sp_health_bar()
         if sp_2 == True:
-            ga_sp_2.draw('space_jam_files\/spaceship.png')
+            sp_1 = False
+            ga_sp_2.draw('space_jam_files\/sp_2.xcf')
             ga_sp_2.movement()
             ga_sp_2.attack()
             ga_sp_2.draw_sp_health_bar()
         orc.draw('space_jam_files\/orc.xcf')
         orc.move()
         orc.attack()
-        orc.draw_orc_health_bar()    
-    
+        orc.draw_orc_health_bar() 
+        
+
     if settings_active == True:
         menu_active = False
         menu_bg.display()
@@ -270,12 +297,7 @@ while True:
         settings_add_tab.display()
         settings_lower_tab.display()
         settings_back_tab.display()
-        if sp_1 == True:
-            settings_sp_1.draw('space_jam_files\/spaceship.png')
-            settings_sp_1.movement()
-        if sp_2 == True:
-            settings_sp_2.draw('space_jam_files\/sp_2.xcf')
-            settings_sp_2.movement()
+        
         
         speed_text.display()
         speed_50_text.display()
@@ -285,14 +307,22 @@ while True:
         #     speed_100_text.display()
         # if speed_150 == True:
         #     speed_150_text.display()
-        
+        if sp_1 == True:
+            sp_2 = False
+            settings_sp_1.draw('space_jam_files\/spaceship.png')
+        elif sp_2 == True:
+            sp_1 = False
+            settings_sp_2.draw('space_jam_files\/sp_2.xcf')
         if event.type == pygame.MOUSEBUTTONDOWN: # goes back to the main menu
             if settings_back_tab.rect.collidepoint(pygame.mouse.get_pos()):
                 menu_active = True
                 settings_active = False
                 game_active = False
             if settings_swap_tab.rect.collidepoint(pygame.mouse.get_pos()):
-                pass
+                sp_2 = True
+                sp_1 = False # under progress, can only switch sp once currently
+                
+
             
         
 
