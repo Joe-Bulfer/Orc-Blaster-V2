@@ -3,15 +3,15 @@ import pygame, sys, os, time
 pygame.init()
 clock = pygame.time.Clock()
 
-screen_width = 900
+screen_width = 900  # specifies the window dimensions
 screen_height = 500
 
-win = pygame.display.set_mode((screen_width,screen_height))
-pygame.display.set_caption('Space')
+win = pygame.display.set_mode((screen_width,screen_height)) # creates the window
+pygame.display.set_caption('Orc Blaster V2') # This creates the caption on the top of the window
 
 title_orc = pygame.transform.scale((pygame.image.load("space_jam_files/orc.xcf")),(300,200)) # static image on main menu screen
 
-settings_active = False
+settings_active = False # placeholder for what will be used to change to the settings menu
   
 class menu_tab: # Creates the menu text
     def __init__(self,text,x,y):
@@ -74,12 +74,13 @@ class background():                 # class creates backround which moves downwa
         self.speed = 2
 
 
-
-menu_bg= background('space_jam_files/black_bg.jpg',0.5) # this class^ which generates a moving background, is very convenient, as the game is developed, levels will be made, which each are located on a specific planet or part of space, requiring a unique backround
+# this class^ which generates a moving background, is very convenient, as the game is developed, levels will be made--
+# --which each are located on a specific planet or part of space, requiring a unique backround
+menu_bg= background('space_jam_files/black_bg.jpg',0.5)
 game_active_bg = background('space_jam_files/black_bg.jpg',2) # simply choose image and speed and you have your background, automatically fitted to the screen, speed = 0 for still image
 pause_bg = background('space_jam_files/black_bg.jpg',0)
 
-class entity(): # having an entity class which player and orc class will inherit from clears up code, and is better structured                              
+class entity(): # having an entity class which player and orc class will inherit from clears up code, and is better structured and optimized                              
     def __init__(self,x,y,width,height,health):
         self.x = x
         self.y = y
@@ -110,7 +111,7 @@ class entity(): # having an entity class which player and orc class will inherit
 
 class enemy(entity):
     def __init__(self,x,y,width,height,health):
-        super().__init__(x,y,width,height,health) # inherits from entity class
+        super().__init__(x,y,width,height,health) # super is a method used to inherit from entity class
         self.x_vel = 1
         self.y_vel = 1
     def spawn(self): # I may add a spawn method which slowly moves the enemy onto the screen, from outside the window
@@ -119,7 +120,7 @@ class enemy(entity):
 
 class Orc(enemy):
     def __init__(self,x,y,width,height,health):
-        super().__init__(x,y,width,height,health)
+        super().__init__(x,y,width,height,health) # also inherits from the entity class
         self.orc_speed = 0 # placeholders
         self.orc_vel = 0
     def move(self): # this movement pattern has the orc follow the player, and moves very dynamic
@@ -185,7 +186,10 @@ class player(entity):
         if self.firing ==True:
             laser_rect = pygame.Rect(self.x + 33,-20,4,424) # creates rect for laser which checks collision with orc
             pygame.draw.rect(win,(255,0,0),(laser_rect)) # blits laser on screen
-def pause():
+            
+# I wrote this pause funtion a long time ago which was the most diffucult code I have ever written. 
+# I will try to review it sometime and explain the logic in the future. Game development is very complex.
+def pause():  
     paused = True
 
     while paused:
@@ -208,16 +212,17 @@ def pause():
         clock.tick(10)
 
 # ga is game active, sp is spaceship
+# these create the respective objects with the exact starting position on the screen
 ga_sp_1 = player(400,380,70,100,900)
 ga_sp_2 = player(400,380,70,100,900)
 orc = Orc(400,30,150,100,100)
 
-# main menu
+# main menu objects
 play_tab = menu_tab("Play Game",100,100)
 settings_tab = menu_tab("Settings",100,160)
 quit_tab = menu_tab("Quit",100,220)
 
-# settings menu
+# settings menu objects
 settings_swap_tab = menu_tab("Change Ship",400,30,)
 settings_add_tab = menu_tab("Add Speed",400,90,)
 settings_lower_tab = menu_tab("Lower Speed",400,150,)
@@ -237,6 +242,10 @@ game_active = False
 settings_active = False
 sp_1 = True # spaceship 1 is default
 sp_2 = False # once player changes sp in settings, another sp_2 is called
+
+
+# main game loop. I will add more comments in the future as I continue reviewing
+
 while True:
 
     for event in pygame.event.get():
