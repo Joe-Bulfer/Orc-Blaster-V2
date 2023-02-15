@@ -1,6 +1,8 @@
 # Orc-Blaster-V2
 A space invaders like game with an object oriented design.
 
+The only requirements to play is to have python, Pip, and pygame installed in that exact order.
+Refer to how_to_play.md for detailed intructions. It will likely take you only 5 minutes.
 
 
 ![image](https://user-images.githubusercontent.com/117784062/219090780-c4948585-8334-4d65-b1e7-55fc397a8595.png)
